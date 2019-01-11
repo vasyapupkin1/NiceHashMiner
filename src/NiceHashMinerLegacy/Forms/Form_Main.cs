@@ -952,10 +952,10 @@ namespace NiceHashMiner
             statusStrip1.Cursor = Cursors.Default;
         }
 
-        private void textBoxBTCAddress_Leave(object sender, EventArgs e)
+        private async void textBoxBTCAddress_Leave(object sender, EventArgs e)
         {
             var trimmedBtcText = textBoxBTCAddress.Text.Trim();
-            var result = ApplicationStateManager.SetBTCIfValidOrDifferent(trimmedBtcText);
+            var result = await ApplicationStateManager.SetBTCIfValidOrDifferent(trimmedBtcText);
             // TODO GUI stuff get back to this
             switch (result)
             {
@@ -976,10 +976,10 @@ namespace NiceHashMiner
             }
         }
 
-        private void textBoxWorkerName_Leave(object sender, EventArgs e)
+        private async void textBoxWorkerName_Leave(object sender, EventArgs e)
         {
             var trimmedWorkerNameText = textBoxWorkerName.Text.Trim();
-            var result = ApplicationStateManager.SetWorkerIfValidOrDifferent(trimmedWorkerNameText);
+            var result = await ApplicationStateManager.SetWorkerIfValidOrDifferent(trimmedWorkerNameText);
             // TODO GUI stuff get back to this
             switch (result)
             {

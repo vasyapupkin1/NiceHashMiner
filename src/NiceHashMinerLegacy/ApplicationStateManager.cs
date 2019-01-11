@@ -136,14 +136,14 @@ namespace NiceHashMiner
 
         // TODO this function is probably not at the right place now
         // We call this when we change BTC and Workername and this is most likely wrong
-        private static void ResetNiceHashStatsCredentials()
+        private static async Task ResetNiceHashStatsCredentials()
         {
             // check if we have valid credentials
             var state = GetCredentialsValidState();
             if (state == CredentialsValidState.VALID)
             {
                 // Reset credentials
-                NiceHashStats.SetCredentials(ConfigManager.GeneralConfig.BitcoinAddress, ConfigManager.GeneralConfig.WorkerName);
+                await NiceHashStats.SetCredentials(ConfigManager.GeneralConfig.BitcoinAddress, ConfigManager.GeneralConfig.WorkerName);
             }
             else
             {
@@ -202,7 +202,7 @@ namespace NiceHashMiner
         #region BTC setter
 
         // make sure to pass in trimmedBtc
-        public static SetResult SetBTCIfValidOrDifferent(string btc)
+        public static async Task<SetResult> SetBTCIfValidOrDifferent(string btc)
         {
             if (btc == ConfigManager.GeneralConfig.BitcoinAddress)
             {
@@ -213,7 +213,7 @@ namespace NiceHashMiner
                 return SetResult.INVALID;
             }
             SetBTC(btc);
-            ResetNiceHashStatsCredentials();
+            await ResetNiceHashStatsCredentials();
             return SetResult.CHANGED;
         }
 
@@ -236,7 +236,7 @@ namespace NiceHashMiner
         #region Worker setter
 
         // make sure to pass in trimmed workerName
-        public static SetResult SetWorkerIfValidOrDifferent(string workerName)
+        public static async Task<SetResult> SetWorkerIfValidOrDifferent(string workerName)
         {
             if (workerName == ConfigManager.GeneralConfig.WorkerName)
             {
@@ -247,7 +247,7 @@ namespace NiceHashMiner
                 return SetResult.INVALID;
             }
             SetWorker(workerName);
-            ResetNiceHashStatsCredentials();
+            await ResetNiceHashStatsCredentials();
             return SetResult.CHANGED;
         }
 

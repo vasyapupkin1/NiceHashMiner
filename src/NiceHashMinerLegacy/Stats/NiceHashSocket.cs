@@ -2,6 +2,7 @@
 using NiceHashMiner.Switching;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using WebSocketSharp;
 
@@ -67,7 +68,7 @@ namespace NiceHashMiner.Stats
             }
         }
 
-        private void ConnectCallback(object sender, EventArgs e)
+        private async void ConnectCallback(object sender, EventArgs e)
         {
             try
             {
@@ -78,7 +79,7 @@ namespace NiceHashMiner.Stats
                     version = version
                 };
                 var loginJson = JsonConvert.SerializeObject(login);
-                SendData(loginJson);
+                await SendData(loginJson);
 
                 OnConnectionEstablished?.Invoke(null, EventArgs.Empty);
             } catch (Exception er)
@@ -104,7 +105,7 @@ namespace NiceHashMiner.Stats
         }
 
         // Don't call SendData on UI threads, since it will block the thread for a bit if a reconnect is needed
-        public bool SendData(string data, bool recurs = false)
+        public async Task<bool> SendData(string data, bool recurs = false)
         {
             try
             {
@@ -116,15 +117,14 @@ namespace NiceHashMiner.Stats
                     if (dataJson.method == "credentials.set" || dataJson.method == "devices.status" || dataJson.method == "login")
                     {
                         Helpers.ConsolePrint("SOCKET", "Sending data: " + data);
-                        _webSocket.Send(data);
-                        return true;
+                        return await SendAsync(data);
                     }
                 } else if (_webSocket != null)
                 {
                     if (AttemptReconnect() && !recurs)
                     {
                         // Reconnect was successful, send data again (safety to prevent recursion overload)
-                        SendData(data, true);
+                        await SendData(data, true);
                     } else
                     {
                         Helpers.ConsolePrint("SOCKET", "Socket connection unsuccessfull, will try again on next device update (1min)");
@@ -145,6 +145,17 @@ namespace NiceHashMiner.Stats
                 Helpers.ConsolePrint("SOCKET", e.ToString());
             }
             return false;
+        }
+
+        private Task<bool> SendAsync(string data)
+        {
+            return Task.Run(() =>
+            {
+                var t = new TaskCompletionSource<bool>();
+                _webSocket.SendAsync(data, b => t.TrySetResult(b));
+
+                return t.Task;
+            });
         }
 
         private bool AttemptReconnect()

@@ -800,10 +800,10 @@ namespace NiceHashMiner.Forms
         }
 
         // TODO copy paste from Form_Main
-        private void textBox_BitcoinAddress_Leave(object sender, EventArgs e)
+        private async void textBox_BitcoinAddress_Leave(object sender, EventArgs e)
         {
             var trimmedBtcText = textBox_BitcoinAddress.Text.Trim();
-            var result = ApplicationStateManager.SetBTCIfValidOrDifferent(trimmedBtcText);
+            var result = await ApplicationStateManager.SetBTCIfValidOrDifferent(trimmedBtcText);
             // TODO get back to this
             switch (result)
             {
@@ -818,10 +818,10 @@ namespace NiceHashMiner.Forms
         }
 
         // TODO copy paste from Form_Main
-        private void textBox_WorkerName_Leave(object sender, EventArgs e)
+        private async void textBox_WorkerName_Leave(object sender, EventArgs e)
         {
             var trimmedWorkerNameText = textBox_WorkerName.Text.Trim();
-            var result = ApplicationStateManager.SetWorkerIfValidOrDifferent(trimmedWorkerNameText);
+            var result = await ApplicationStateManager.SetWorkerIfValidOrDifferent(trimmedWorkerNameText);
             // TODO GUI stuff get back to this
             switch (result)
             {
@@ -1036,12 +1036,6 @@ namespace NiceHashMiner.Forms
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
             IsChange = true;
             IsChangeSaved = true;
-
-            if (_isCredChange)
-            {
-                NiceHashStats.SetCredentials(ConfigManager.GeneralConfig.BitcoinAddress.Trim(),
-                    ConfigManager.GeneralConfig.WorkerName.Trim());
-            }
 
             Close();
         }
